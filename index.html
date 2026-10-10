@@ -1,545 +1,522 @@
 <!DOCTYPE html>
-<html lang="uk" class="h-full">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Серця ❤️ та Зорі ⭐ • 10.11</title>
-  
-  <!-- Telegram WebApp Script -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>❤️ Серця та Зорі ⭐ | Гра для двох</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            serif: ['"Playfair Display"', 'serif'],
-          },
-          colors: {
-            midnight: '#0A0814',
-            cosmic: '#130F24',
-            espresso: '#1A142E',
-            roseHeart: '#FF2A6D',
-            goldStar: '#FFB800',
-            violetGlow: '#9D4EDD',
-          },
-          boxShadow: {
-            'glow-heart': '0 0 25px rgba(255, 42, 109, 0.45)',
-            'glow-star': '0 0 25px rgba(255, 184, 0, 0.4)',
-            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.45)',
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    /* Custom scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 4px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 9999px;
+    :root {
+      --bg: #121016;
+      --card-bg: #1c1824;
+      --accent: #ff4d6d;
+      --accent-glow: rgba(255, 77, 109, 0.35);
+      --star: #ffb703;
+      --star-glow: rgba(255, 183, 3, 0.35);
+      --text: #f8f9fa;
+      --text-muted: #a09cb0;
+      --border: #2e283b;
+      --key-bg: #262133;
+      --key-active: #38314a;
     }
 
-    /* Ambient dynamic starry canvas */
-    #space-canvas {
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 440px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #ff4d6d, #ffb703);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .author-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      background: rgba(255, 77, 109, 0.15);
+      color: #ff85a1;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 77, 109, 0.3);
+      margin-top: 4px;
+    }
+
+    .btn-icon {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .btn-icon:active {
+      transform: scale(0.95);
+    }
+
+    .input-display {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 8px 0;
+    }
+
+    .digit-box {
+      width: 56px;
+      height: 64px;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .digit-box.filled {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .history {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px;
+      max-height: 220px;
+      min-height: 140px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      font-size: 1.05rem;
+    }
+
+    .guess-code {
+      font-weight: 700;
+      letter-spacing: 4px;
+    }
+
+    .feedback-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    .badge-heart {
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .badge-star {
+      color: var(--star);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .key {
+      background: var(--key-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 14px 0;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .key:active {
+      background: var(--key-active);
+      transform: scale(0.96);
+    }
+
+    .key-action {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .key-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+    }
+
+    .key-submit:active {
+      background: #e63956;
+    }
+
+    .modal-overlay {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: center;
+    }
+
+    .modal input, .modal textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      resize: none;
+    }
+
+    .modal input:focus, .modal textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .letter-card {
+      background: rgba(255, 77, 109, 0.08);
+      border: 1px dashed var(--accent);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: left;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    canvas#confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Slot insertion pop animation */
-    @keyframes slotPop {
-      0% { transform: scale(0.8); opacity: 0.3; }
-      50% { transform: scale(1.15); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .animate-slot-pop {
-      animation: slotPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
-    /* Celebration floating particles */
-    @keyframes floatParticle {
-      0% {
-        transform: translateY(105vh) scale(0.5) rotate(0deg);
-        opacity: 0.95;
-      }
-      100% {
-        transform: translateY(-15vh) scale(1.25) rotate(360deg);
-        opacity: 0;
-      }
-    }
-    .floating-particle {
-      position: fixed;
-      pointer-events: none;
-      z-index: 70;
-      animation: floatParticle 4.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
-
-    /* Touch screen prevention of blue selection */
-    button, input, textarea {
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
+      z-index: 99;
     }
   </style>
 </head>
+<body>
 
-<body class="bg-midnight text-gray-100 font-sans h-full overflow-x-hidden selection:bg-roseHeart selection:text-white relative">
-  <!-- Interactive Dynamic Night Sky Background -->
-  <canvas id="space-canvas"></canvas>
+  <canvas id="confetti"></canvas>
 
-  <!-- Atmospheric Glow Orbs -->
-  <div class="fixed top-[-10%] left-[-15%] w-[380px] h-[380px] rounded-full bg-roseHeart/15 blur-[120px] pointer-events-none"></div>
-  <div class="fixed bottom-[-10%] right-[-15%] w-[380px] h-[380px] rounded-full bg-violetGlow/15 blur-[130px] pointer-events-none"></div>
-
-  <!-- Mobile Screen Shell -->
-  <div class="relative z-10 max-w-md mx-auto min-h-full flex flex-col justify-between px-4 py-3 pb-5">
-
-    <!-- Top App Navigation Header -->
-    <header class="flex items-center justify-between pt-1 pb-2 border-b border-white/5">
-      <div class="flex items-center space-x-2.5">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-roseHeart/25 to-goldStar/20 border border-white/15 flex items-center justify-center shadow-glass backdrop-blur-md">
-          <span class="text-roseHeart text-xl animate-pulse">❤️</span>
-        </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-base font-extrabold tracking-tight text-white">Серця & Зорі</h1>
-            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-roseHeart/20 text-roseHeart border border-roseHeart/30">10.11</span>
-          </div>
-          <p class="text-[11px] text-gray-400">Романтичний шифр • Будь-які 4 цифри</p>
-        </div>
+  <div id="app">
+    <header>
+      <div>
+        <div class="title">Серця та Зорі</div>
+        <div id="custom-badge" class="author-badge" style="display: none;"></div>
       </div>
-
-      <!-- Action Buttons (Sound, Rules, Create) -->
-      <div class="flex items-center space-x-1.5">
-        <!-- Sound Toggle -->
-        <button id="btn-toggle-sound" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition active:scale-95 text-gray-300" title="Увімкнути/Вимкнути звук">
-          <span id="sound-icon" class="text-sm">🔊</span>
-        </button>
-
-        <!-- Rules Button -->
-        <button id="btn-open-rules" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition active:scale-95 text-gray-300" title="Правила гри">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </button>
-
-        <!-- Create Round Button -->
-        <button id="btn-open-creator" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-roseHeart/25 to-goldStar/25 hover:from-roseHeart/35 hover:to-goldStar/35 border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5 transition active:scale-95 shadow-glass">
-          <span>✨</span>
-          <span>Загадати</span>
-        </button>
+      <div style="display: flex; gap: 8px;">
+        <button id="sound-btn" class="btn-icon">🔊</button>
+        <button id="create-btn" class="btn-icon">✨ Загадати</button>
       </div>
     </header>
 
-    <!-- Custom Author Notification Banner -->
-    <div id="author-banner" class="hidden mt-2 px-3 py-2 rounded-xl bg-gradient-to-r from-roseHeart/15 to-violetGlow/15 border border-roseHeart/25 text-xs text-roseHeart/90 flex items-center justify-between shadow-glass backdrop-blur-md">
-      <div class="flex items-center gap-1.5 truncate">
-        <span>💌</span>
-        <span class="truncate">Особистий шифр від: <strong id="author-name" class="text-white font-semibold">Саші</strong></span>
-      </div>
-      <span class="text-[10px] px-1.5 py-0.5 rounded bg-roseHeart/25 text-white font-mono uppercase tracking-wider font-bold">Таємниця</span>
+    <div class="input-display">
+      <div class="digit-box" id="d0"></div>
+      <div class="digit-box" id="d1"></div>
+      <div class="digit-box" id="d2"></div>
+      <div class="digit-box" id="d3"></div>
     </div>
 
-    <!-- Active 4-Digit Input Slot Area -->
-    <section class="my-2.5">
-      <div class="bg-espresso/80 border border-white/10 rounded-2xl p-4 shadow-glass backdrop-blur-xl">
-        <div class="flex items-center justify-between mb-2.5 text-xs">
-          <span class="text-gray-300 font-medium">Твоя комбінація</span>
-          <div class="flex items-center gap-1.5">
-            <span class="text-gray-400">Спроба:</span>
-            <span id="attempt-counter" class="text-roseHeart font-mono font-bold text-sm bg-roseHeart/15 px-2 py-0.5 rounded-md border border-roseHeart/25">1</span>
-          </div>
-        </div>
+    <div class="history" id="history-box"></div>
 
-        <!-- 4 Digit Visual Slots -->
-        <div class="grid grid-cols-4 gap-2.5">
-          <div class="slot-box aspect-square rounded-2xl bg-white/5 border border-white/15 flex items-center justify-center text-2xl font-bold font-mono transition-all duration-200" id="slot-0">
-            <span class="text-gray-600 font-light">•</span>
-          </div>
-          <div class="slot-box aspect-square rounded-2xl bg-white/5 border border-white/15 flex items-center justify-center text-2xl font-bold font-mono transition-all duration-200" id="slot-1">
-            <span class="text-gray-600 font-light">•</span>
-          </div>
-          <div class="slot-box aspect-square rounded-2xl bg-white/5 border border-white/15 flex items-center justify-center text-2xl font-bold font-mono transition-all duration-200" id="slot-2">
-            <span class="text-gray-600 font-light">•</span>
-          </div>
-          <div class="slot-box aspect-square rounded-2xl bg-white/5 border border-white/15 flex items-center justify-center text-2xl font-bold font-mono transition-all duration-200" id="slot-3">
-            <span class="text-gray-600 font-light">•</span>
-          </div>
-        </div>
-
-        <!-- Legend -->
-        <div class="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-300 px-1">
-          <div class="flex items-center gap-1.5 font-medium">
-            <span class="text-roseHeart text-sm">❤️</span> <span>Серце = точне місце</span>
-          </div>
-          <div class="flex items-center gap-1.5 font-medium">
-            <span class="text-goldStar text-sm">⭐</span> <span>Зоря = цифра є, місце інше</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Guess History Panel -->
-    <section class="flex-1 my-1 flex flex-col min-h-[140px] max-h-[220px]">
-      <div class="flex items-center justify-between px-1 pb-1.5 text-xs text-gray-400">
-        <span class="font-medium">Історія спроб</span>
-        <button id="btn-restart-game" class="text-[11px] text-gray-400 hover:text-white transition flex items-center gap-1">
-          <span>🔄</span>
-          <span>Почати заново</span>
-        </button>
-      </div>
-
-      <div id="history-container" class="flex-1 overflow-y-auto space-y-2 pr-1 rounded-2xl bg-black/30 border border-white/5 p-2 backdrop-blur-md">
-        <!-- Empty State -->
-        <div id="history-empty" class="h-full flex flex-col items-center justify-center py-6 text-center text-gray-500">
-          <span class="text-2xl mb-1 opacity-50">✨</span>
-          <p class="text-xs">Введи будь-які 4 цифри (числа можуть повторюватися) й натисни «Готово»</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Mobile Responsive Numpad (Buttons never disable) -->
-    <section class="mt-auto pt-2">
-      <div class="grid grid-cols-3 gap-2">
-        <!-- Digits 1 to 9 -->
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="1">1</button>
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="2">2</button>
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="3">3</button>
-
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="4">4</button>
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="5">5</button>
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="6">6</button>
-
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="7">7</button>
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="8">8</button>
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="9">9</button>
-
-        <!-- Backspace Button -->
-        <button id="btn-backspace" class="h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-red-500/20 border border-white/10 text-gray-300 flex items-center justify-center transition-transform active:scale-95" title="Видалити цифру">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414-6.414A2 2 0 0110.828 5H20a2 2 0 012 2v10a2 2 0 01-2 2h-9.172a2 2 0 01-1.414-.586L3 12z" />
-          </svg>
-        </button>
-
-        <!-- Digit 0 -->
-        <button class="num-btn h-12 rounded-xl bg-white/5 hover:bg-white/10 active:bg-roseHeart/25 border border-white/10 text-xl font-mono font-bold text-white shadow-sm transition-transform active:scale-95" data-num="0">0</button>
-
-        <!-- Submit Button -->
-        <button id="btn-submit" disabled class="h-12 rounded-xl bg-gradient-to-r from-roseHeart via-pink-600 to-roseHeart disabled:opacity-30 disabled:cursor-not-allowed text-white font-bold text-sm flex items-center justify-center gap-1 shadow-glow-heart transition-all active:scale-95" title="Перевірити комбінацію">
-          <span>Готово</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-          </svg>
-        </button>
-      </div>
-    </section>
-
+    <div class="numpad">
+      <button class="key" data-val="1">1</button>
+      <button class="key" data-val="2">2</button>
+      <button class="key" data-val="3">3</button>
+      <button class="key" data-val="4">4</button>
+      <button class="key" data-val="5">5</button>
+      <button class="key" data-val="6">6</button>
+      <button class="key" data-val="7">7</button>
+      <button class="key" data-val="8">8</button>
+      <button class="key" data-val="9">9</button>
+      <button class="key key-action" id="key-del">⌫</button>
+      <button class="key" data-val="0">0</button>
+      <button class="key key-submit" id="key-ok">✓</button>
+    </div>
   </div>
 
-  <!-- Victory Celebration Modal (Opens on 4 Hearts) -->
-  <div id="win-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-2xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="w-full max-w-sm bg-gradient-to-b from-[#1C1330] via-cosmic to-midnight border border-white/20 rounded-3xl p-6 shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-300 max-h-[92vh] flex flex-col" id="win-card">
+  <!-- Модальне вікно створення нової гри -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <h3 style="color: var(--accent);">Створити таємницю</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Введи будь-які 4 цифри (числа можуть повторюватися та починатися з нуля).
+      </p>
+      <input type="text" id="new-code" placeholder="Код (напр. 1011)" maxlength="4" style="text-align: center; letter-spacing: 6px; font-weight: bold; font-size: 1.3rem;">
+      <input type="text" id="new-author" placeholder="Твоє ім'я (напр. Саша)">
+      <textarea id="new-letter" rows="4" placeholder="Твій лист або послання..."></textarea>
       
-      <!-- Ambient Lighting in Modal -->
-      <div class="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-roseHeart/30 blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-12 -left-12 w-36 h-36 rounded-full bg-goldStar/25 blur-3xl pointer-events-none"></div>
-
-      <!-- Header Icon & Title -->
-      <div class="text-center mb-3">
-        <div class="w-16 h-16 mx-auto rounded-full bg-roseHeart/20 border border-roseHeart/40 flex items-center justify-center text-3xl shadow-glow-heart animate-bounce">
-          ❤️
-        </div>
-        <h2 class="text-2xl font-serif font-bold text-white mt-2">Шифр розгадано!</h2>
-        <p class="text-xs text-roseHeart font-mono tracking-widest uppercase mt-0.5 font-semibold">❤️❤️❤️❤️ 4 Серця • Абсолютна точність</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="close-modal">Скасувати</button>
+        <button class="btn-primary" id="gen-link-btn">Сформувати посилання</button>
       </div>
 
-      <!-- Romantic Letter Parchment Container -->
-      <div class="flex-1 overflow-y-auto pr-1 my-2.5 bg-black/40 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 leading-relaxed font-serif shadow-inner">
-        <div class="text-center font-sans not-italic text-xs text-goldStar uppercase tracking-wider mb-2 font-bold flex items-center justify-center gap-1">
-          <span>💌</span>
-          <span id="win-letter-title">Особливе послання до річниці</span>
-        </div>
-        <div id="win-letter-content" class="space-y-2.5 italic text-gray-100/90 text-sm">
-          <!-- Filled dynamically via JavaScript -->
-        </div>
+      <div id="link-result" style="display: none; margin-top: 10px;">
+        <input type="text" id="share-link" readonly style="font-size: 0.8rem; margin-bottom: 8px;">
+        <button class="btn-primary" id="copy-btn" style="width: 100%;">📋 Скопіювати посилання</button>
       </div>
-
-      <!-- Stats Pill Bar -->
-      <div class="flex items-center justify-around py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs mb-3.5 text-gray-300">
-        <div>Код: <strong id="win-code-display" class="font-mono text-goldStar font-bold text-sm">0000</strong></div>
-        <div class="w-px h-4 bg-white/15"></div>
-        <div>Спроб: <strong id="win-attempts-display" class="font-mono text-roseHeart font-bold text-sm">1</strong></div>
-      </div>
-
-      <!-- Modal Action Buttons -->
-      <div class="space-y-2">
-        <button id="btn-win-create" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-roseHeart via-pink-600 to-roseHeart hover:opacity-95 text-white font-bold text-xs uppercase tracking-wider transition active:scale-95 shadow-glow-heart flex items-center justify-center gap-1.5">
-          <span>✨</span>
-          <span>Загадати шифр у відповідь</span>
-        </button>
-        <button id="btn-replay" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-xs font-semibold transition active:scale-95">
-          Спробувати зіграти ще раз
-        </button>
-      </div>
-
     </div>
   </div>
 
-  <!-- Create Round / Secret Custom Code Modal -->
-  <div id="create-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-2xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="w-full max-w-sm bg-gradient-to-b from-[#19112E] to-midnight border border-white/20 rounded-3xl p-5 shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-300 max-h-[92vh] flex flex-col">
-      
-      <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">✨</span>
-          <h3 class="font-bold text-white text-base">Загадати романтичний шифр</h3>
-        </div>
-        <button id="btn-close-create" class="p-1 rounded-lg text-gray-400 hover:text-white transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto space-y-3.5 pr-1 text-xs">
-        <!-- 4-digit code (repeats allowed, zeros allowed) -->
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="text-gray-200 font-semibold">
-              Таємний 4-значний код:
-            </label>
-            <span class="text-[10px] text-goldStar/90 font-medium">Можна будь-які цифри й нулі</span>
-          </div>
-          <input type="text" id="input-custom-code" maxlength="4" placeholder="0000, 1122, 1011..." class="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 focus:border-roseHeart focus:outline-none font-mono text-center text-xl tracking-widest text-white placeholder-gray-600">
-          <p class="text-[10px] text-gray-400 mt-1">Цифри можуть повторюватися (напр. 1122, 0000, 7771) або починатися з 0.</p>
-          <p id="code-error" class="hidden text-roseHeart text-[11px] mt-1 font-medium"></p>
-        </div>
-
-        <!-- Sender name -->
-        <div>
-          <label class="block text-gray-200 font-semibold mb-1">Твоє ім'я чи підпис:</label>
-          <input type="text" id="input-custom-author" placeholder="Саша" value="Саша" class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 focus:border-roseHeart focus:outline-none text-white text-xs placeholder-gray-600">
-        </div>
-
-        <!-- Secret Love Letter -->
-        <div>
-          <label class="block text-gray-200 font-semibold mb-1">Таємний лист (відкриється після 4 Сердець):</label>
-          <textarea id="input-custom-letter" rows="4" placeholder="Напиши щирі слова, спогади чи комплімент..." class="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/15 focus:border-roseHeart focus:outline-none text-white text-xs leading-relaxed placeholder-gray-600 resize-none font-serif"></textarea>
-        </div>
-
-        <!-- Generated Link Block -->
-        <div id="generated-link-box" class="hidden space-y-2 pt-2 border-t border-white/10">
-          <span class="text-emerald-400 font-semibold flex items-center gap-1">
-            <span>✓</span> Посилання сформовано!
-          </span>
-          <div class="flex items-center gap-1.5">
-            <input type="text" id="output-link" readonly class="w-full px-2.5 py-2 rounded-lg bg-black/50 border border-white/15 text-[11px] text-gray-200 font-mono select-all">
-            <button id="btn-copy-link" class="px-3.5 py-2 rounded-lg bg-roseHeart hover:bg-roseHeart/90 text-white font-bold text-xs whitespace-nowrap transition active:scale-95 shadow-glow-heart">
-              Копіювати
-            </button>
-          </div>
-          <p class="text-[10px] text-gray-400">Надішли це посилання в Telegram. Гра відкриється з твоїм зашифрованим кодом та листом!</p>
-        </div>
-      </div>
-
-      <div class="pt-3 border-t border-white/10 mt-3">
-        <button id="btn-generate-link" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-roseHeart via-pink-600 to-roseHeart text-white font-bold text-xs uppercase tracking-wider transition active:scale-95 shadow-glow-heart">
-          Сформувати посилання
-        </button>
-      </div>
-
+  <!-- Модальне вікно перемоги -->
+  <div class="modal-overlay" id="win-modal">
+    <div class="modal">
+      <h2 style="color: var(--accent);">Шифр розгадано! 🎉</h2>
+      <p id="win-stats" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+      <div class="letter-card" id="win-letter"></div>
+      <button class="btn-primary" onclick="location.reload();">Грати знову</button>
     </div>
-  </div>
-
-  <!-- Rules Modal -->
-  <div id="rules-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-2xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="w-full max-w-sm bg-gradient-to-b from-[#19112E] to-midnight border border-white/20 rounded-3xl p-5 shadow-2xl relative text-xs">
-      
-      <div class="flex items-center justify-between pb-2.5 border-b border-white/10 mb-3">
-        <h3 class="font-bold text-white text-sm flex items-center gap-1.5">
-          <span>📖</span> Правила «Серця & Зорі»
-        </h3>
-        <button id="btn-close-rules" class="p-1 rounded-lg text-gray-400 hover:text-white transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div class="space-y-3 text-gray-200 leading-relaxed">
-        <p>Це улюблена гра <strong>«Бики та Корови»</strong> у ніжній романтичній стилістиці:</p>
-        
-        <div class="space-y-2 bg-white/5 p-3 rounded-xl border border-white/10">
-          <div class="flex items-start gap-2">
-            <span class="text-roseHeart text-base mt-[-2px]">❤️</span>
-            <div>
-              <strong class="text-white">Серце (Бик):</strong>
-              <p class="text-[11px] text-gray-400">Цифра збігається і стоїть на своєму точному місці.</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-2">
-            <span class="text-goldStar text-base mt-[-2px]">⭐</span>
-            <div>
-              <strong class="text-white">Зоря (Корова):</strong>
-              <p class="text-[11px] text-gray-400">Цифра є в коді, але розташована на іншій позиції.</p>
-            </div>
-          </div>
-        </div>
-
-        <ul class="list-disc pl-4 space-y-1.5 text-gray-300 text-[11px]">
-          <li><strong>Будь-які комбінації:</strong> дозволено повтори (наприклад, <code class="text-goldStar font-mono">1122</code>, <code class="text-goldStar font-mono">0000</code>, <code class="text-goldStar font-mono">1011</code>).</li>
-          <li><strong>Нулі на початку:</strong> код може починатися з будь-якої цифри, включно з нулями.</li>
-          <li><strong>Мета:</strong> вибити <strong class="text-roseHeart font-mono">4 Серця (❤️❤️❤️❤️)</strong> та прочитати таємне послання!</li>
-        </ul>
-      </div>
-
-      <button id="btn-rules-ok" class="mt-4 w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold transition active:scale-95">
-        Все зрозуміло, грати!
-      </button>
-
-    </div>
-  </div>
-
-  <!-- Toast Notification Bar -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-gray-900/95 border border-white/20 text-white text-xs shadow-2xl backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
-    <span id="toast-icon">✨</span>
-    <span id="toast-text">Сповіщення</span>
   </div>
 
   <script>
-    /* Web Audio API Synthesizer with Sound Toggle */
+    // --- ЗВУКИ ТА ВІБРАЦІЯ ---
+    let soundEnabled = true;
     let audioCtx = null;
-    let isSoundMuted = false;
 
-    function initAudio() {
+    function getAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
+      return audioCtx;
     }
 
-    function playTone(freq, type = 'sine', duration = 0.08, gainVal = 0.05) {
-      if (isSoundMuted) return;
+    function playBeep(freq = 440, duration = 0.08) {
+      if (!soundEnabled) return;
       try {
-        initAudio();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = freq;
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
         osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch (e) {
-        // Fallback if audio autoplay is restricted
-      }
-    }
-
-    function triggerHaptic(type = 'light') {
-      try {
-        if (window.Telegram?.WebApp?.HapticFeedback) {
-          if (type === 'success') {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-          } else if (type === 'error') {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-          } else {
-            window.Telegram.WebApp.HapticFeedback.impactOccurred(type);
-          }
-        }
+        osc.stop(ctx.currentTime + duration);
       } catch (e) {}
     }
 
-    function soundTap() {
-      playTone(520, 'sine', 0.05, 0.03);
-      triggerHaptic('light');
-    }
-    function soundDelete() {
-      playTone(310, 'sine', 0.06, 0.03);
-      triggerHaptic('medium');
-    }
-    function soundSubmit() {
-      playTone(660, 'sine', 0.08, 0.04);
-      triggerHaptic('medium');
-    }
-    function soundWin() {
-      triggerHaptic('success');
-      setTimeout(() => playTone(523.25, 'triangle', 0.35, 0.08), 0);   // C5
-      setTimeout(() => playTone(659.25, 'triangle', 0.35, 0.08), 120); // E5
-      setTimeout(() => playTone(783.99, 'triangle', 0.45, 0.08), 240); // G5
-      setTimeout(() => playTone(1046.50, 'triangle', 0.6, 0.09), 380); // C6
+    function vibrate(ms = 30) {
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+      } else if (navigator.vibrate) {
+        navigator.vibrate(ms);
+      }
     }
 
-    // Default romantic anniversary message
-    const DEFAULT_SECRET = "1011"; // Nov 10 format with repeating '1'
-    const DEFAULT_AUTHOR = "Саша";
-    const DEFAULT_LETTER = `Аню, якщо ти бачиш це повідомлення — ти відкрила мій головний шифр! ❤️
+    document.getElementById('sound-btn').onclick = () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+    };
 
-Рівно рік тому, 10 листопада, все почалося з кількох повідомлень у нашому вечірньому чаті. Ми тоді ще навіть не здогадувалися, наскільки цей день змінить усе на краще.
+    // --- БЕЗПЕЧНЕ КОДУВАННЯ ТА ДЕКОДУВАННЯ UTF-8 ---
+    function safeBtoa(str) {
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+        return String.fromCharCode('0x' + p1);
+      }));
+    }
 
-Дякую тобі за цей рік. За кожну суботу, за наші незмінні розмови о 22:00, за спокій і затишок, який ти даруєш мені навіть на відстані. Поруч із тобою зникає будь-яка тривога, і для мого серця твій столик зарезервовано назавжди.
+    function safeAtob(str) {
+      return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+    }
 
-З нашою річницею! ✨`;
-
-    let activeSecretCode = DEFAULT_SECRET;
-    let activeLetter = DEFAULT_LETTER;
-    let activeAuthor = DEFAULT_AUTHOR;
-
-    let currentGuess = [];
-    let attemptsHistory = [];
+    // --- СТАН ГРИ ---
+    let secretCode = "1234";
+    let authorName = "";
+    let secretLetter = "Вітаю з перемогою! ❤️";
+    let currentInput = "";
+    let attemptsCount = 0;
     let isGameOver = false;
 
-    /**
-     * Mastermind Algorithm with full support for repeating digits:
-     * Pass 1: exact matches (Hearts / Bulls)
-     * Pass 2: remaining digit occurrences (Stars / Cows)
-     */
-    function evaluateGuess(guessStr, secretStr) {
-      const guess = guessStr.split('');
-      const secret = secretStr.split('');
+    // --- ЗЧИТУВАННЯ ПОСИЛАННЯ ---
+    function initGame() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let rawData = urlParams.get('game') || urlParams.get('data');
+
+      if (rawData) {
+        try {
+          rawData = rawData.replace(/ /g, '+');
+          const payload = JSON.parse(safeAtob(rawData));
+          if (payload.code && payload.code.length === 4) {
+            secretCode = String(payload.code);
+            authorName = payload.author || "";
+            secretLetter = payload.letter || secretLetter;
+
+            const badge = document.getElementById('custom-badge');
+            badge.textContent = authorName ? `💌 Загадка від: ${authorName}` : '💌 Особиста загадка';
+            badge.style.display = 'inline-block';
+          }
+        } catch (e) {
+          console.error("Помилка розшифровки посилання:", e);
+        }
+      } else {
+        secretCode = Array.from({length: 4}, () => Math.floor(Math.random() * 10)).join('');
+      }
+    }
+
+    initGame();
+
+    // --- ВВЕДЕННЯ ЧИСЕЛ ---
+    function updateDisplay() {
+      for (let i = 0; i < 4; i++) {
+        const box = document.getElementById(`d${i}`);
+        box.textContent = currentInput[i] || "";
+        box.classList.toggle('filled', !!currentInput[i]);
+      }
+    }
+
+    document.querySelectorAll('.key[data-val]').forEach(btn => {
+      btn.onclick = () => {
+        if (isGameOver || currentInput.length >= 4) return;
+        currentInput += btn.dataset.val;
+        playBeep(480);
+        vibrate();
+        updateDisplay();
+      };
+    });
+
+    document.getElementById('key-del').onclick = () => {
+      if (isGameOver || currentInput.length === 0) return;
+      currentInput = currentInput.slice(0, -1);
+      playBeep(320);
+      vibrate();
+      updateDisplay();
+    };
+
+    // --- АЛГОРИТМ MASTERMIND З ПОВТОРАМИ ТА НУЛЯМИ ---
+    function checkGuess(guess, secret) {
       let hearts = 0;
       let stars = 0;
 
-      const matchedSecret = [false, false, false, false];
-      const matchedGuess = [false, false, false, false];
+      const gArr = guess.split('');
+      const sArr = secret.split('');
+      const gUsed = [false, false, false, false];
+      const sUsed = [false, false, false, false];
 
-      // Pass 1: Count Hearts (exact position & value)
+      // 1-й прохід: точні збіги (Серця)
       for (let i = 0; i < 4; i++) {
-        if (guess[i] === secret[i]) {
+        if (gArr[i] === sArr[i]) {
           hearts++;
-          matchedSecret[i] = true;
-          matchedGuess[i] = true;
+          gUsed[i] = true;
+          sUsed[i] = true;
         }
       }
 
-      // Pass 2: Count Stars (value exists elsewhere among unmatched)
+      // 2-й прохід: збіги не на своїх позиціях (Зорі)
       for (let i = 0; i < 4; i++) {
-        if (!matchedGuess[i]) {
+        if (!gUsed[i]) {
           for (let j = 0; j < 4; j++) {
-            if (!matchedSecret[j] && guess[i] === secret[j]) {
+            if (!sUsed[j] && gArr[i] === sArr[j]) {
               stars++;
-              matchedSecret[j] = true;
+              sUsed[j] = true;
               break;
             }
           }
@@ -549,493 +526,128 @@
       return { hearts, stars };
     }
 
-    function generateRandomCode() {
-      let code = '';
-      for (let i = 0; i < 4; i++) {
-        code += Math.floor(Math.random() * 10).toString();
-      }
-      return code;
-    }
+    // --- ПІДТВЕРДЖЕННЯ ХОДУ ---
+    document.getElementById('key-ok').onclick = () => {
+      if (isGameOver || currentInput.length !== 4) return;
 
-    // Unicode-safe Base64 encoding/decoding helper
-    function utf8ToBase64(str) {
-      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
-        return String.fromCharCode('0x' + p1);
-      }));
-    }
+      attemptsCount++;
+      const { hearts, stars } = checkGuess(currentInput, secretCode);
 
-    function base64ToUtf8(str) {
-      return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-    }
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `
+        <span class="guess-code">${currentInput}</span>
+        <div class="feedback-badges">
+          <span class="badge-heart">${hearts} ❤️</span>
+          <span class="badge-star">${stars} ⭐</span>
+        </div>
+      `;
+      document.getElementById('history-box').appendChild(item);
 
-    function loadGameFromURL() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const dataParam = urlParams.get('game') || urlParams.get('data');
-      
-      if (dataParam) {
-        try {
-          const decodedJSON = base64ToUtf8(dataParam);
-          const payload = JSON.parse(decodedJSON);
-          
-          if (payload && payload.code && /^\d{4}$/.test(payload.code)) {
-            activeSecretCode = payload.code;
-            activeLetter = payload.letter || DEFAULT_LETTER;
-            activeAuthor = payload.author || DEFAULT_AUTHOR;
-
-            const banner = document.getElementById('author-banner');
-            const authorSpan = document.getElementById('author-name');
-            authorSpan.textContent = activeAuthor;
-            banner.classList.remove('hidden');
-            return;
-          }
-        } catch (e) {
-          console.warn("Could not decode custom round from URL, falling back to default.", e);
-        }
-      }
-
-      // If no valid URL parameter, generate a fresh random 4-digit code (repeats allowed)
-      activeSecretCode = DEFAULT_SECRET;
-      activeLetter = DEFAULT_LETTER;
-      activeAuthor = DEFAULT_AUTHOR;
-    }
-
-    function updateSlotsUI() {
-      for (let i = 0; i < 4; i++) {
-        const slotEl = document.getElementById(`slot-${i}`);
-        slotEl.innerHTML = '';
-        
-        if (i < currentGuess.length) {
-          const val = currentGuess[i];
-          const span = document.createElement('span');
-          span.className = 'text-white animate-slot-pop text-roseHeart';
-          span.textContent = val;
-          slotEl.appendChild(span);
-          slotEl.classList.add('border-roseHeart/60', 'bg-roseHeart/15');
-          slotEl.classList.remove('border-white/15', 'bg-white/5');
-        } else {
-          const dot = document.createElement('span');
-          dot.className = (i === currentGuess.length) ? 'text-gray-400 animate-pulse' : 'text-gray-600 font-light';
-          dot.textContent = '•';
-          slotEl.appendChild(dot);
-          slotEl.classList.remove('border-roseHeart/60', 'bg-roseHeart/15');
-          slotEl.classList.add('border-white/15', 'bg-white/5');
-        }
-      }
-
-      // IMPORTANT: Numpad buttons NEVER disable, allowing any repeating digits!
-      const submitBtn = document.getElementById('btn-submit');
-      if (currentGuess.length === 4 && !isGameOver) {
-        submitBtn.disabled = false;
+      if (hearts === 4) {
+        handleWin();
       } else {
-        submitBtn.disabled = true;
+        playBeep(260, 0.15);
       }
+
+      currentInput = "";
+      updateDisplay();
+    };
+
+    // --- ПЕРЕМОГА ---
+    function handleWin() {
+      isGameOver = true;
+      playBeep(660, 0.2);
+      setTimeout(() => playBeep(880, 0.3), 150);
+      startConfetti();
+
+      document.getElementById('win-stats').textContent = `Спроб: ${attemptsCount}`;
+      document.getElementById('win-letter').textContent = secretLetter;
+      setTimeout(() => {
+        document.getElementById('win-modal').style.display = 'flex';
+      }, 500);
     }
 
-    function renderHistory() {
-      const container = document.getElementById('history-container');
-      const emptyState = document.getElementById('history-empty');
+    // --- ГЕНЕРАТОР ПОСИЛАНЬ ---
+    const createModal = document.getElementById('create-modal');
+    document.getElementById('create-btn').onclick = () => createModal.style.display = 'flex';
+    document.getElementById('close-modal').onclick = () => {
+      createModal.style.display = 'none';
+      document.getElementById('link-result').style.display = 'none';
+    };
 
-      if (attemptsHistory.length === 0) {
-        container.innerHTML = '';
-        container.appendChild(emptyState);
-        document.getElementById('attempt-counter').textContent = 1;
+    document.getElementById('gen-link-btn').onclick = () => {
+      const code = document.getElementById('new-code').value.trim();
+      const author = document.getElementById('new-author').value.trim();
+      const letter = document.getElementById('new-letter').value.trim();
+
+      if (!/^\d{4}$/.test(code)) {
+        alert("Код має містити рівно 4 будь-які цифри!");
         return;
       }
 
-      container.innerHTML = '';
+      const payload = { code, author, letter };
+      const rawBase64 = safeBtoa(JSON.stringify(payload));
+      const safeParam = encodeURIComponent(rawBase64);
+      const url = `${window.location.origin}${window.location.pathname}?game=${safeParam}`;
 
-      attemptsHistory.forEach((attempt, index) => {
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono transition-all animate-slot-pop';
+      const shareInput = document.getElementById('share-link');
+      shareInput.value = url;
+      document.getElementById('link-result').style.display = 'block';
+    };
 
-        const leftBox = document.createElement('div');
-        leftBox.className = 'flex items-center space-x-2.5';
-        leftBox.innerHTML = `
-          <span class="text-gray-500 text-[10px] w-4">#${index + 1}</span>
-          <span class="text-base font-extrabold tracking-widest text-white">${attempt.guess}</span>
-        `;
-
-        const rightBox = document.createElement('div');
-        rightBox.className = 'flex items-center space-x-2';
-
-        if (attempt.hearts === 0 && attempt.stars === 0) {
-          rightBox.innerHTML = `<span class="text-[11px] text-gray-500 font-sans italic">повз ☁️</span>`;
-        } else {
-          let badgesHTML = '';
-          if (attempt.hearts > 0) {
-            badgesHTML += `
-              <span class="px-2 py-0.5 rounded-lg bg-roseHeart/25 text-roseHeart border border-roseHeart/35 font-bold flex items-center gap-1 shadow-sm">
-                <span>❤️</span> ${attempt.hearts}
-              </span>
-            `;
-          }
-          if (attempt.stars > 0) {
-            badgesHTML += `
-              <span class="px-2 py-0.5 rounded-lg bg-goldStar/20 text-goldStar border border-goldStar/35 font-bold flex items-center gap-1 shadow-sm">
-                <span>⭐</span> ${attempt.stars}
-              </span>
-            `;
-          }
-          rightBox.innerHTML = badgesHTML;
-        }
-
-        row.appendChild(leftBox);
-        row.appendChild(rightBox);
-        container.insertBefore(row, container.firstChild);
-      });
-
-      document.getElementById('attempt-counter').textContent = attemptsHistory.length + 1;
-    }
-
-    function handleGuessSubmit() {
-      if (currentGuess.length !== 4 || isGameOver) return;
-
-      const guessStr = currentGuess.join('');
-      soundSubmit();
-
-      const result = evaluateGuess(guessStr, activeSecretCode);
-      attemptsHistory.push({
-        guess: guessStr,
-        hearts: result.hearts,
-        stars: result.stars
-      });
-
-      currentGuess = [];
-      updateSlotsUI();
-      renderHistory();
-
-      if (result.hearts === 4) {
-        // Victory Condition: 4 Hearts!
-        isGameOver = true;
-        soundWin();
-        triggerVictoryModal(guessStr, attemptsHistory.length);
-      }
-    }
-
-    function triggerVictoryModal(code, totalAttempts) {
-      // Spawn romantic confetti particles
-      for (let i = 0; i < 28; i++) {
-        setTimeout(() => {
-          createFloatingParticle();
-        }, i * 130);
-      }
-
-      document.getElementById('win-code-display').textContent = code;
-      document.getElementById('win-attempts-display').textContent = totalAttempts;
-
-      const letterContainer = document.getElementById('win-letter-content');
-      letterContainer.innerHTML = '';
-      
-      const paragraphs = activeLetter.split('\n\n');
-      paragraphs.forEach(para => {
-        if (para.trim()) {
-          const p = document.createElement('p');
-          p.textContent = para.trim();
-          letterContainer.appendChild(p);
-        }
-      });
-
-      setTimeout(() => {
-        const modal = document.getElementById('win-modal');
-        const card = document.getElementById('win-card');
-        modal.classList.remove('opacity-0', 'pointer-events-none');
-        card.classList.remove('scale-95');
-        card.classList.add('scale-100');
-      }, 600);
-    }
-
-    function createFloatingParticle() {
-      const p = document.createElement('div');
-      p.className = 'floating-particle text-2xl select-none';
-      const emojis = ['❤️', '💖', '✨', '⭐', '💕', '🌹'];
-      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      p.style.left = `${Math.random() * 90 + 5}vw`;
-      p.style.animationDuration = `${Math.random() * 2 + 3.2}s`;
-      document.body.appendChild(p);
-
-      setTimeout(() => {
-        p.remove();
-      }, 4800);
-    }
-
-    function handleNumPress(digit) {
-      if (isGameOver) return;
-      if (currentGuess.length < 4) {
-        currentGuess.push(digit);
-        soundTap();
-        updateSlotsUI();
-      }
-    }
-
-    function handleBackspace() {
-      if (isGameOver) return;
-      if (currentGuess.length > 0) {
-        currentGuess.pop();
-        soundDelete();
-        updateSlotsUI();
-      }
-    }
-
-    function showToast(text, icon = '✨') {
-      const toast = document.getElementById('toast');
-      document.getElementById('toast-text').textContent = text;
-      document.getElementById('toast-icon').textContent = icon;
-      toast.classList.remove('opacity-0', 'pointer-events-none');
-      toast.classList.add('opacity-100');
-
-      setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2500);
-    }
-
-    function copyToClipboard(text) {
-      const tempInput = document.createElement('textarea');
-      tempInput.value = text;
-      tempInput.style.position = 'fixed';
-      tempInput.style.opacity = '0';
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      
-      let success = false;
+    document.getElementById('copy-btn').onclick = async () => {
+      const shareInput = document.getElementById('share-link');
       try {
-        success = document.execCommand('copy');
+        await navigator.clipboard.writeText(shareInput.value);
+        alert("Посилання успішно скопійовано!");
       } catch (err) {
-        console.error('Copy fallback error', err);
+        shareInput.select();
+        document.execCommand('copy');
+        alert("Посилання скопійовано!");
       }
-      document.body.removeChild(tempInput);
+    };
 
-      if (success) {
-        showToast('Посилання скопійовано! Надішли в Telegram', '💌');
-      } else {
-        showToast('Скопіюй посилання з поля вище', 'ℹ️');
-      }
-    }
-
-    function setupCustomRoundCreator() {
-      const codeInput = document.getElementById('input-custom-code');
-      const authorInput = document.getElementById('input-custom-author');
-      const letterInput = document.getElementById('input-custom-letter');
-      const generateBtn = document.getElementById('btn-generate-link');
-      const errorMsg = document.getElementById('code-error');
-      const outputBox = document.getElementById('generated-link-box');
-      const outputLink = document.getElementById('output-link');
-      const copyBtn = document.getElementById('btn-copy-link');
-
-      letterInput.value = DEFAULT_LETTER;
-
-      generateBtn.addEventListener('click', () => {
-        const rawCode = codeInput.value.trim();
-        errorMsg.classList.add('hidden');
-
-        // Validation: Exactly 4 digits from 0-9. NO RESTRICTIONS ON DUPLICATES!
-        if (!/^\d{4}$/.test(rawCode)) {
-          errorMsg.textContent = 'Код має містити рівно 4 будь-які цифри (напр. 1122, 0000, 1011)!';
-          errorMsg.classList.remove('hidden');
-          return;
-        }
-
-        const payload = {
-          code: rawCode,
-          author: authorInput.value.trim() || 'Саша',
-          letter: letterInput.value.trim() || DEFAULT_LETTER
-        };
-
-        try {
-          const encodedPayload = utf8ToBase64(JSON.stringify(payload));
-          const baseUrl = window.location.origin + window.location.pathname;
-          const shareableUrl = `${baseUrl}?game=${encodedPayload}`;
-
-          outputLink.value = shareableUrl;
-          outputBox.classList.remove('hidden');
-          showToast('Посилання з кодом готове!', '🎉');
-        } catch (e) {
-          console.error(e);
-          errorMsg.textContent = 'Помилка формування посилання';
-          errorMsg.classList.remove('hidden');
-        }
-      });
-
-      copyBtn.addEventListener('click', () => {
-        copyToClipboard(outputLink.value);
-      });
-    }
-
-    function setupEventListeners() {
-      // Numpad key triggers
-      document.querySelectorAll('.num-btn').forEach(btn => {
-        btn.addEventListener('click', () => handleNumPress(btn.dataset.num));
-      });
-
-      document.getElementById('btn-backspace').addEventListener('click', handleBackspace);
-      document.getElementById('btn-submit').addEventListener('click', handleGuessSubmit);
-
-      // Sound Mute Toggle
-      const soundBtn = document.getElementById('btn-toggle-sound');
-      const soundIcon = document.getElementById('sound-icon');
-      soundBtn.addEventListener('click', () => {
-        isSoundMuted = !isSoundMuted;
-        soundIcon.textContent = isSoundMuted ? '🔇' : '🔊';
-        showToast(isSoundMuted ? 'Звук вимкнено' : 'Звук увімкнено', isSoundMuted ? '🔇' : '🔊');
-      });
-
-      // Restart game button
-      document.getElementById('btn-restart-game').addEventListener('click', () => {
-        currentGuess = [];
-        attemptsHistory = [];
-        isGameOver = false;
-        updateSlotsUI();
-        renderHistory();
-        showToast('Гру перезапущено', '🔄');
-      });
-
-      // Rules Modal Triggers
-      const rulesModal = document.getElementById('rules-modal');
-      document.getElementById('btn-open-rules').addEventListener('click', () => {
-        rulesModal.classList.remove('opacity-0', 'pointer-events-none');
-      });
-      document.getElementById('btn-close-rules').addEventListener('click', () => {
-        rulesModal.classList.add('opacity-0', 'pointer-events-none');
-      });
-      document.getElementById('btn-rules-ok').addEventListener('click', () => {
-        rulesModal.classList.add('opacity-0', 'pointer-events-none');
-      });
-
-      // Creator Modal Triggers
-      const createModal = document.getElementById('create-modal');
-      document.getElementById('btn-open-creator').addEventListener('click', () => {
-        createModal.classList.remove('opacity-0', 'pointer-events-none');
-      });
-      document.getElementById('btn-close-create').addEventListener('click', () => {
-        createModal.classList.add('opacity-0', 'pointer-events-none');
-      });
-
-      // Win Modal Actions
-      document.getElementById('btn-win-create').addEventListener('click', () => {
-        document.getElementById('win-modal').classList.add('opacity-0', 'pointer-events-none');
-        createModal.classList.remove('opacity-0', 'pointer-events-none');
-      });
-
-      document.getElementById('btn-replay').addEventListener('click', () => {
-        document.getElementById('win-modal').classList.add('opacity-0', 'pointer-events-none');
-        currentGuess = [];
-        attemptsHistory = [];
-        isGameOver = false;
-        updateSlotsUI();
-        renderHistory();
-      });
-
-      // Physical keyboard support for desktop browser testing
-      window.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-        if (/^[0-9]$/.test(e.key)) {
-          handleNumPress(e.key);
-        } else if (e.key === 'Backspace') {
-          handleBackspace();
-        } else if (e.key === 'Enter') {
-          handleGuessSubmit();
-        }
-      });
-    }
-
-    function initDynamicNightSky() {
-      const canvas = document.getElementById('space-canvas');
+    // --- СВЯТКОВЕ КОНФЕТІ ---
+    function startConfetti() {
+      const canvas = document.getElementById('confetti');
       const ctx = canvas.getContext('2d');
-      let stars = [];
-      let shootingStars = [];
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-      function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        initStars();
-      }
+      const particles = Array.from({ length: 60 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -10,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 60,
+        color: ['#ff4d6d', '#ff758f', '#ffb703', '#ffffff'][Math.floor(Math.random() * 4)],
+        tilt: Math.random() * 10 - 10,
+        tiltAngleInc: Math.random() * 0.08 + 0.04,
+        tiltAngle: 0
+      }));
 
-      function initStars() {
-        stars = [];
-        const count = Math.floor((canvas.width * canvas.height) / 7500);
-        for (let i = 0; i < count; i++) {
-          stars.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 1.5 + 0.3,
-            alpha: Math.random(),
-            speed: Math.random() * 0.015 + 0.005
-          });
-        }
-      }
-
-      function addShootingStar() {
-        if (Math.random() < 0.015 && shootingStars.length < 2) {
-          shootingStars.push({
-            x: Math.random() * canvas.width * 0.8,
-            y: Math.random() * canvas.height * 0.4,
-            length: Math.random() * 80 + 40,
-            speed: Math.random() * 10 + 12,
-            angle: Math.PI / 4,
-            alpha: 1
-          });
-        }
-      }
-
-      function draw() {
+      let animationFrame;
+      function render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.tiltAngle += p.tiltAngleInc;
+          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 1.8;
+          p.tilt = Math.sin(p.tiltAngle) * 12;
 
-        // Draw twinkling stars
-        for (let s of stars) {
-          s.alpha += s.speed;
-          if (s.alpha > 1 || s.alpha < 0) s.speed = -s.speed;
-          ctx.fillStyle = `rgba(255, 240, 250, ${Math.abs(s.alpha) * 0.8})`;
           ctx.beginPath();
-          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Draw shooting stars
-        addShootingStar();
-        for (let i = shootingStars.length - 1; i >= 0; i--) {
-          const star = shootingStars[i];
-          ctx.strokeStyle = `rgba(255, 184, 0, ${star.alpha})`;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(star.x, star.y);
-          ctx.lineTo(star.x - Math.cos(star.angle) * star.length, star.y - Math.sin(star.angle) * star.length);
+          ctx.lineWidth = p.r / 2;
+          ctx.strokeStyle = p.color;
+          ctx.moveTo(p.x + p.tilt + p.r / 4, p.y);
+          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 4);
           ctx.stroke();
+        });
 
-          star.x += Math.cos(star.angle) * star.speed;
-          star.y += Math.sin(star.angle) * star.speed;
-          star.alpha -= 0.025;
-
-          if (star.alpha <= 0) {
-            shootingStars.splice(i, 1);
-          }
+        if (particles.some(p => p.y < canvas.height)) {
+          animationFrame = requestAnimationFrame(render);
         }
-
-        requestAnimationFrame(draw);
       }
-
-      window.addEventListener('resize', resize);
-      resize();
-      draw();
+      render();
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      // Initialize Telegram WebApp if available
-      try {
-        if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.ready();
-          window.Telegram.WebApp.expand();
-        }
-      } catch (e) {}
-
-      loadGameFromURL();
-      setupEventListeners();
-      setupCustomRoundCreator();
-      initDynamicNightSky();
-      updateSlotsUI();
-      renderHistory();
-    });
   </script>
 </body>
 </html>
